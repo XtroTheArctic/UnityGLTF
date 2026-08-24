@@ -1,3 +1,8 @@
+#if !UNITY_6000_4_OR_NEWER
+
+// Legacy RenderPass / RenderGraph Version for pre Unity 6.4 Versions
+
+
 #if HAVE_URP_12_OR_NEWER || HAVE_URP_10_OR_NEWER
 
 using System;
@@ -21,8 +26,9 @@ namespace UnityGLTF
 #if !UNITY_2022_3_OR_NEWER
 	    [SerializeField]
 #endif
+#if !UNITY_6000_2_OR_NEWER
 		private Downsampling downsampling = Downsampling.None;
-
+#endif
 	    class CustomRenderPass : CopyColorPass
 	    {
 	        public Downsampling m_DownsamplingMethod;
@@ -205,7 +211,7 @@ namespace UnityGLTF
 #endif
 	    }
 	    
-#if UNITY_2022_3_OR_NEWER
+#if UNITY_2022_3_OR_NEWER && !UNITY_6000_2_OR_NEWER
 		public override void SetupRenderPasses(ScriptableRenderer renderer, in RenderingData renderingData)
 		{
 #pragma warning disable 618
@@ -270,7 +276,7 @@ namespace UnityGLTF
 	                rgDesc.autoGenerateMips = true;
 	                rgDesc.useMipMap = true;
 	                rgDesc.msaaSamples = MSAASamples.None;
-	                rgDesc.filterMode = FilterMode.Bilinear;
+	                rgDesc.filterMode = FilterMode.Trilinear;
 	                rgDesc.wrapMode = TextureWrapMode.Clamp;
 
 	                rgDesc.bindTextureMS = cameraData.cameraTargetDescriptor.bindMS;
@@ -297,4 +303,5 @@ namespace UnityGLTF
 	}
 }
 
+#endif
 #endif

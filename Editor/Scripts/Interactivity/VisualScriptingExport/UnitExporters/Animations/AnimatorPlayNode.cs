@@ -46,7 +46,9 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
             }
             
             var animationState = AnimatorHelper.GetAnimationState(target, stateName);
-            int animationId = unitExporter.vsExportContext.exporter.GetAnimationId(animationState.motion as AnimationClip, target.transform, animationState.speed);
+            float clipSpeed = unitExporter.Context.exporter.BakeAnimationSpeed ? animationState.speed : 1f;
+            
+            int animationId = unitExporter.vsExportContext.exporter.GetAnimationId(animationState.motion as AnimationClip, target.transform, clipSpeed);
 
             if (animationId == -1)
             {
@@ -54,11 +56,47 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
                 return false;
             }
 
-            node.ValueInConnection[Animation_StartNode.IdValueAnimation].Value = animationId;
-            node.ValueInConnection[Animation_StartNode.IdValueSpeed].Value = animationState.speed;
+            var clipRef = AnimationHelper.GetAnimationClipRef(unitExporter, animationId);
+
+            node.ValueIn(Animation_StartNode.IdValueAnimationRef).ConnectToSource(clipRef);
+            node.ValueIn(Animation_StartNode.IdValueSpeed).SetValue(Mathf.Abs(animationState.speed));
 
             // TODO: Get from clip start from state cycleOffset
-            node.ValueInConnection[Animation_StartNode.IdValueStartTime].Value = 0.0f;
+           
+            AnimationClip clip = animationState.motion as AnimationClip;
+            bool isReversed = animationState.speed < 0 && !unitExporter.Context.exporter.BakeAnimationSpeed;
+            
+    
+            if (clip != null && clip.isLooping)
+            {
+                if (isReversed)
+                {
+                    var clipLengthRef = AnimationHelper.GetAnimationLength(unitExporter, animationId);
+                    node.ValueIn(Animation_StartNode.IdValueStartTime).ConnectToSource(clipLengthRef);
+                    node.ValueIn(Animation_StartNode.IdValueEndtime).SetValue(float.NegativeInfinity);
+                    
+                }
+                else
+                {
+                    node.ValueIn(Animation_StartNode.IdValueStartTime).SetValue(0f);
+                    node.ValueIn(Animation_StartNode.IdValueEndtime).SetValue(float.PositiveInfinity);
+        
+                }
+            }
+            else if (isReversed)
+            {
+                var clipLengthRef = AnimationHelper.GetAnimationLength(unitExporter, animationId);
+                node.ValueIn(Animation_StartNode.IdValueStartTime).ConnectToSource(clipLengthRef);
+                node.ValueIn(Animation_StartNode.IdValueEndtime).SetValue(0f);
+            }
+            else
+            {
+                var clipLengthRef = AnimationHelper.GetAnimationLength(unitExporter, animationId);
+                node.ValueIn(Animation_StartNode.IdValueStartTime).SetValue(0f);
+                node.ValueIn(Animation_StartNode.IdValueEndtime).ConnectToSource(clipLengthRef);
+                
+            }
+            
 
             var otherAnimationStates = AnimatorHelper.GetAllAnimationStates(target);
             var stopSequence = unitExporter.CreateNode<Flow_SequenceNode>();
@@ -70,13 +108,16 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
                 if (state == animationState)
                     continue;
                 
-                int stopAnimationId = unitExporter.vsExportContext.exporter.GetAnimationId(state.motion as AnimationClip, target.transform);
+                int stopAnimationId = unitExporter.vsExportContext.exporter.GetAnimationId(state.motion as AnimationClip,
+                    target.transform, unitExporter.Context.exporter.BakeAnimationSpeed ? state.speed : 1f);
+                
                 if (stopAnimationId == -1)
                     continue;
                 
+                var stopClipRef = AnimationHelper.GetAnimationClipRef(unitExporter, stopAnimationId);
+
                 var stopNode = unitExporter.CreateNode<Animation_StopNode>();
-                stopNode.ValueIn(Animation_StopNode.IdValueAnimation)
-                    .SetValue(stopAnimationId);
+                stopNode.ValueIn(Animation_StopNode.IdValueAnimationRef).ConnectToSource(stopClipRef);
 
                 var sequFlowId =$"{index.ToString("D3")}_stopAnim_{stopAnimationId}";
                 index++;
@@ -86,10 +127,7 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
             var lastSequenceFlow = stopSequence.FlowOut("zzz");
             lastSequenceFlow.ConnectToFlowDestination(node.FlowIn(Animation_StartNode.IdFlowIn));
             
-            AnimationClip clip = animationState.motion as AnimationClip;
-            node.ValueInConnection[Animation_StartNode.IdValueEndtime].Value =
-                (clip != null && !clip.isLooping) ? clip.length : float.PositiveInfinity;
-
+            
             // There should only be one output flow from the Animator.Play node
             unitExporter.MapOutFlowConnectionWhenValid(unit.exit, Animation_StartNode.IdFlowOut, node);
             return true;

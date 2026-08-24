@@ -4,6 +4,140 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.21.0] - 2026-08-14
+- add: Asset Importer > loop settings can now be set per animation clip
+- add: lightmap UV generation support for meshes with blend shapes
+- fix: compile error in Unity 6.4 non-URP projects
+- fix: `ReadOnlySpan` texture loading is now guarded to Unity 6.1+ 
+
+## [2.20.1] - 2026-08-12
+- fix: HDRP double sided material import
+- fix: HDRP alpha cutoff material import
+
+## [2.20.0] - 2026-07-31
+- add: `KHR_interactivity` export is now an official part of UnityGLTF: the Visual Scripting export plugin is enabled by default and no longer marked as non-ratified. 
+- add: export support for embedded textures in .gltf+.bin exports (option, default = false)
+- add: Anim.Pointer: warning logs for unresolved properties
+- change: skipping non-exportable animation material properties entirely
+- fix: Mixamo left hand finger bone detection for pinky3 and middle2
+
+## [2.19.5] - 2026-04-29
+- fix: compiler error in Unity 6.3 > wrong ifdef
+
+## [2.19.4] - 2026-04-22
+- fix: Unity 6.3+ api changes for Shader/Material propertyType
+- fix: Unity 6.4+ warnings for `GetInstanceId` (changed to GetEntityId)
+- fix: RoughRefractionFeature for Unity 6.4+ with new Render Graph API (new separate file)
+- fix: removed unused field in GLTFImporter (causing warnings in Unity 6.6)
+
+## [2.19.3] - 2026-03-27
+- fix: HDRP material import setup for opaque materials
+- change: HDRP only > ignoring transmission when transmission-factor is 0 
+
+## [2.19.2] - 2026-03-25
+- fix: file paths with spaces and plus in name results in not found errors
+- fix: GLTFSetting asset > plugins subasset creation in import mode
+- fix: safety checks for draco import
+- change: reduced memory footprint on texture import for non-memory-streams
+
+## [2.19.1] - 2026-02-19
+- add: import support for webP textures (requires package https://github.com/netpyoung/unity.webp)
+- add: import support for exr textures (requires Unity 6+)
+- change: using span arrays for more efficient data handling in texture loading
+- fix: plugin list in default GLTF settings asset was not updating when plugins were added or removed
+- fix: unsupported texture extensions was using first image instead of skipping the texture, which caused incorrect texture imports in some cases
+- fix: animator and statemachine export
+- fix: safeguards againts empty bufferview data
+
+## [2.18.9] - 2026-02-09
+- fix: 'BaseGraphMap' was using wrong property name, changed to '_DstBlendAlpha'
+- fix: import of meshes with same attributes but different materials, are now properly deduplicated instead of being imported as separate meshes
+- fix: support for Unity 2021.3
+
+## [2.18.8] - 2026-02-05
+- add: deduplication statistic (Importer)
+- add: meshOpt 0.2 support
+- add: validation for node translation, rotation and scale on import: in case of invalid values (NaN, infinte), using zeros as fallback.
+- changed: mesh deduplication speedup with Jobs
+- fix: reduced memory footprint on importing
+
+## [2.18.7] - 2026-01-12
+- add: Interactivity: add slerp nodes
+- change: Interactivity: replaced custom solution for child and parent methods to object model pointers
+- fix: obsolete warning for 'GameObject.GetScene' in U6.3+
+- fix: ShaderPassStripping to use GetOrCreate GltfSettings (in case setting asset not exists yet)
+- fix: Interactivity: changed matrix serialization to coloumn major order
+- fix: material/texture extraction with leading spaces in name
+
+## [2.18.6] - 2025-11-25
+- add: Interactivity VS export: added support for `AnimationClip.length`
+- fix: Interactivity VS export: added missing space conversion to `RaycastResult.worldPosition`
+- fix: `WebRequestDataLoader` changed URI handling for local files    
+
+## [2.18.5] - 2025-11-20
+- fix: deprecation warnings in Unity 6.2+
+
+## [2.18.4] - 2025-11-19
+- change: Interactivity spec changes
+- fix: BuiltRP material double side export
+
+## [2.18.3] - 2025-10-16
+- fix: animation step detection logic error
+
+## [2.18.2] - 2025-10-15
+- fix: Unity Build error
+
+## [2.18.1] - 2025-10-15
+- fix: visibility animation tracks changed to unsigned byte data type (0 = false, >0 = true) and STEP interpolationtype
+- add: Interactivity: merging on export of onSelect, onHoverIn and onHoverOut with same target (spec allows only once per target) 
+
+## [2.18.0] - 2025-10-08
+- add: animation support for KHR_node_visibility extension
+- add: export support for URP/Lit materials with "Preserve Specular" enabled
+- fix: animation export: add missing value component curves
+- fix: RoughRefraction filterMode set to Trilinear in RenderGraph mode (fixes #884)
+- fix: missing queue setup when using dispersion (fixes #883)
+- fix: BakeAnimation on export when speed < 0
+- fix: Interactivity Animator.Play export: speed, starttime, endtime setup
+- fix: Interactivity Animator.play: changed start time to cliplength when reversed
+- change: removed obsolete warning for KTX > 3.5 and Draco > 5.2
+- change: clearer animation export warning when gameobject was not exported
+- change: updated README with logo
+
+## [2.17.11] - 2025-09-22
+- fix: blendshape runtime import, positions was getting scaled to zero
+
+## [2.17.10] - 2025-09-12
+- fix: `texcoord` export, previously it was only exported when `Texture Transforms` was enabled
+- fix: Texture export cache, now using the Texture `updateCount` to ensure we don't use an older version from cache
+- fix: PBRGraph inspector now shows UV coordinate properties more reliably
+
+## [2.17.9] - 2025-08-25
+- add: `MarkMaterialAsCustomShaderExport` API to keep original property names in animations
+- change: Importer should always show buttons for Extract / Restore materials
+
+## [2.17.8] - 2025-08-20
+- fix: Build error
+
+## [2.17.7] - 2025-08-20
+- fix: Interactivity: wrong sockets after Tick nodes cleanup
+- fix: Interactivity: input type resolving for GenericMul-Unit export, when inputs comes from CustomEvent
+- fix: added missing ImportContext.SceneImporter assignment 
+
+## [2.17.6] - 2025-08-06
+- fix: order of export checks was wrong for `emissiveFactor` / `_EmissionColor`
+- fix: update to latest KHR_interactivity specification changes from July 2025
+- fix: prevent endless loop in KHR_interactivity type conversion in some edge cases
+- fix: correct input types for `p1` and `p2` in `pointer/interpolate` schema
+- add: support for member interpolation for `Material.mainColor`
+
+## [2.17.5] - 2025-07-25
+- fix: Compiler error when TMP is not installed
+
+## [2.17.4] - 2025-07-17
+- fix: Exporting animation should not abort export for unknown properties
+- fix: Warn when UnityGLTF/PBRGraph can't be imported due to insufficient shader variant limit in Unity
+
 ## [2.17.3] - 2025-07-13
 - fix: Restore accidentally removed using
 - fix: Prevent NullReferenceException when exporting textures via callback without other textures in the file

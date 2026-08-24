@@ -621,7 +621,37 @@ namespace GLTF.Schema
 					throw new Exception("Unsupported component type.");
 			}
 		}
+		
+		public unsafe byte[] AsUByteArray(ref NumericArray contents, NativeArray<byte> bufferViewData, uint offset = 0)
+		{
+			if (contents.AsBytes != null)
+			{
+				return contents.AsBytes;
+			}
 
+			if (Type != GLTFAccessorAttributeType.SCALAR)
+			{
+				return null;
+			}
+
+			var arr = new byte[Count];
+
+			if (bufferViewData == default)
+			{
+				contents.AsBytes = arr;
+				return arr;
+			}
+
+			var totalByteOffset = ByteOffset + offset;
+
+			var bufferPointer = NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr<byte>(bufferViewData);
+			for (uint idx = 0; idx < Count; idx++)
+				arr[idx] = GetUByteElement(bufferPointer, totalByteOffset + idx);
+
+			contents.AsBytes = arr;
+			return arr;
+		}
+		
 		public unsafe uint[] AsUIntArray(ref NumericArray contents, NativeArray<byte> bufferViewData, uint offset = 0)
 		{
 			if (contents.AsUInts != null)
@@ -635,11 +665,18 @@ namespace GLTF.Schema
 			}
 
 			var arr = new uint[Count];
+
+			if (bufferViewData == default)
+			{
+				contents.AsUInts = arr;
+				return arr;
+			}
+
 			var totalByteOffset = ByteOffset + offset;
 
 			GetTypeDetails(ComponentType, out uint componentSize, out _);
 			var bufferPointer = NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr<byte>(bufferViewData);
-			uint stride = BufferView.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize;
+			uint stride = BufferView?.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize;
 
 			if (ComponentType == GLTFComponentType.Float)
 			{
@@ -715,12 +752,19 @@ namespace GLTF.Schema
 			}
 
 			var arr = new float2[Count];
+
+			if (bufferViewData == default)
+			{
+				contents.AsFloat2s = arr;
+				return arr;
+			}
+
 			var totalByteOffset = ByteOffset + offset;
 
 			GetTypeDetails(ComponentType, out uint componentSize, out float maxValue);
 			var bufferPointer = NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr<byte>(bufferViewData);
 
-			uint stride = BufferView.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize * 2;
+			uint stride = BufferView?.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize * 2;
 			if (!normalizeIntValues) maxValue = 1;
 
 			if (ComponentType == GLTFComponentType.Float)
@@ -797,12 +841,19 @@ namespace GLTF.Schema
 			}
 
 			var arr = new float3[Count];
+
+			if (bufferViewData == default)
+			{
+				contents.AsFloat3s = arr;
+				return arr;
+			}
+
 			var totalByteOffset = ByteOffset + offset;
 
 			GetTypeDetails(ComponentType, out uint componentSize, out float maxValue);
 			var bufferPointer = NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr<byte>(bufferViewData);
 
-			uint stride = BufferView.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize * 3;
+			uint stride = BufferView?.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize * 3;
 			if (!normalizeIntValues) maxValue = 1;
 
 			if (ComponentType == GLTFComponentType.Float)
@@ -874,12 +925,19 @@ namespace GLTF.Schema
 			}
 
 			var arr = new float4[Count];
+
+			if (bufferViewData == default)
+			{
+				contents.AsFloat4s = arr;
+				return arr;
+			}
+
 			var totalByteOffset = ByteOffset + offset;
 
 			GetTypeDetails(ComponentType, out uint componentSize, out float maxValue);
 			var bufferPointer = NativeArrayUnsafeUtility.GetUnsafeReadOnlyPtr<byte>(bufferViewData);
 
-			uint stride = BufferView.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize * 4;
+			uint stride = BufferView?.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize * 4;
 			if (!normalizeIntValues) maxValue = 1;
 
 			if (ComponentType == GLTFComponentType.Float)
@@ -1068,6 +1126,13 @@ namespace GLTF.Schema
 			}
 
 			float4x4[] arr = new float4x4[Count];
+
+			if (bufferViewData == default)
+			{
+				contents.AsMatrix4x4s = arr;
+				return arr;
+			}
+
 			uint totalByteOffset = ByteOffset + offset;
 
 			GetTypeDetails(ComponentType, out uint componentSize, out float maxValue);
@@ -1075,7 +1140,7 @@ namespace GLTF.Schema
 
 			if (!normalizeIntValues) maxValue = 1;
 
-			uint stride = (uint)(BufferView.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize * 16);
+			uint stride = (uint)(BufferView?.Value.ByteStride > 0 ? BufferView.Value.ByteStride : componentSize * 16);
 
 			for (uint idx = 0; idx < Count; idx++)
 			{
@@ -1427,6 +1492,9 @@ namespace GLTF.Schema
 	[StructLayout(LayoutKind.Explicit)]
 	public struct NumericArray
 	{
+		[FieldOffset(0)]
+		public byte[] AsBytes;
+		
 		[FieldOffset(0)]
 		public uint[] AsUInts;
 		
