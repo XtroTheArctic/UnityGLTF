@@ -23,87 +23,87 @@ namespace UnityGLTF
 	[CanEditMultipleObjects]
 	internal class GLTFImporterInspector : UnityGLTFTabbedEditor
 	{
-        static Texture BoneAssignmentDotIcon;
-        static Texture BoneAssignmentDotFrameIcon;
-        static Texture BoneAssignmentDotFrameDottedIcon;
+		static Texture BoneAssignmentDotIcon;
+		static Texture BoneAssignmentDotFrameIcon;
+		static Texture BoneAssignmentDotFrameDottedIcon;
 
-        static string[] boneGroupTabs = { "Body", "Head", "Left Hand", "Right Hand" };
-        static new Dictionary<string, string> boneGroups = new()
-        {
-            { "Hips", "Body" },
-            { "Spine", "Body" },
-            { "Chest", "Body" },
-            { "UpperChest", "Body" },
-            { "Neck", "Body" },
-            { "LeftUpperLeg", "Body" },
-            { "RightUpperLeg", "Body" },
-            { "LeftLowerLeg", "Body" },
-            { "RightLowerLeg", "Body" },
-            { "LeftFoot", "Body" },
-            { "RightFoot", "Body" },
-            { "LeftToes", "Body" },
-            { "RightToes", "Body" },
-            { "LeftShoulder", "Body" },
-            { "LeftUpperArm", "Body" },
-            { "LeftLowerArm", "Body" },
-            { "LeftHand", "Body" },
-            { "RightShoulder", "Body" },
-            { "RightUpperArm", "Body" },
-            { "RightLowerArm", "Body" },
-            { "RightHand", "Body" },
+		static string[] boneGroupTabs = { "Body", "Head", "Left Hand", "Right Hand" };
+		static new Dictionary<string, string> boneGroups = new()
+		{
+			{ "Hips", "Body" },
+			{ "Spine", "Body" },
+			{ "Chest", "Body" },
+			{ "UpperChest", "Body" },
+			{ "Neck", "Body" },
+			{ "LeftUpperLeg", "Body" },
+			{ "RightUpperLeg", "Body" },
+			{ "LeftLowerLeg", "Body" },
+			{ "RightLowerLeg", "Body" },
+			{ "LeftFoot", "Body" },
+			{ "RightFoot", "Body" },
+			{ "LeftToes", "Body" },
+			{ "RightToes", "Body" },
+			{ "LeftShoulder", "Body" },
+			{ "LeftUpperArm", "Body" },
+			{ "LeftLowerArm", "Body" },
+			{ "LeftHand", "Body" },
+			{ "RightShoulder", "Body" },
+			{ "RightUpperArm", "Body" },
+			{ "RightLowerArm", "Body" },
+			{ "RightHand", "Body" },
 
-            { "Head", "Head" },
-            { "Jaw", "Head" },
-            { "LeftEye", "Head" },
-            { "RightEye", "Head" },
+			{ "Head", "Head" },
+			{ "Jaw", "Head" },
+			{ "LeftEye", "Head" },
+			{ "RightEye", "Head" },
 
-            { "Left Thumb Proximal", "Left Hand" },
-            { "Left Thumb Intermediate", "Left Hand" },
-            { "Left Thumb Distal", "Left Hand" },
-            { "Left Index Proximal", "Left Hand" },
-            { "Left Index Intermediate", "Left Hand" },
-            { "Left Index Distal", "Left Hand" },
-            { "Left Middle Proximal", "Left Hand" },
-            { "Left Middle Intermediate", "Left Hand" },
-            { "Left Middle Distal", "Left Hand" },
-            { "Left Ring Proximal", "Left Hand" },
-            { "Left Ring Intermediate", "Left Hand" },
-            { "Left Ring Distal", "Left Hand" },
-            { "Left Little Proximal", "Left Hand" },
-            { "Left Little Intermediate", "Left Hand" },
-            { "Left Little Distal", "Left Hand" },
+			{ "Left Thumb Proximal", "Left Hand" },
+			{ "Left Thumb Intermediate", "Left Hand" },
+			{ "Left Thumb Distal", "Left Hand" },
+			{ "Left Index Proximal", "Left Hand" },
+			{ "Left Index Intermediate", "Left Hand" },
+			{ "Left Index Distal", "Left Hand" },
+			{ "Left Middle Proximal", "Left Hand" },
+			{ "Left Middle Intermediate", "Left Hand" },
+			{ "Left Middle Distal", "Left Hand" },
+			{ "Left Ring Proximal", "Left Hand" },
+			{ "Left Ring Intermediate", "Left Hand" },
+			{ "Left Ring Distal", "Left Hand" },
+			{ "Left Little Proximal", "Left Hand" },
+			{ "Left Little Intermediate", "Left Hand" },
+			{ "Left Little Distal", "Left Hand" },
 
-            { "Right Thumb Proximal", "Right Hand" },
-            { "Right Thumb Intermediate", "Right Hand" },
-            { "Right Thumb Distal", "Right Hand" },
-            { "Right Index Proximal", "Right Hand" },
-            { "Right Index Intermediate", "Right Hand" },
-            { "Right Index Distal", "Right Hand" },
-            { "Right Middle Proximal", "Right Hand" },
-            { "Right Middle Intermediate", "Right Hand" },
-            { "Right Middle Distal", "Right Hand" },
-            { "Right Ring Proximal", "Right Hand" },
-            { "Right Ring Intermediate", "Right Hand" },
-            { "Right Ring Distal", "Right Hand" },
-            { "Right Little Proximal", "Right Hand" },
-            { "Right Little Intermediate", "Right Hand" },
-            { "Right Little Distal", "Right Hand" },
-        };
+			{ "Right Thumb Proximal", "Right Hand" },
+			{ "Right Thumb Intermediate", "Right Hand" },
+			{ "Right Thumb Distal", "Right Hand" },
+			{ "Right Index Proximal", "Right Hand" },
+			{ "Right Index Intermediate", "Right Hand" },
+			{ "Right Index Distal", "Right Hand" },
+			{ "Right Middle Proximal", "Right Hand" },
+			{ "Right Middle Intermediate", "Right Hand" },
+			{ "Right Middle Distal", "Right Hand" },
+			{ "Right Ring Proximal", "Right Hand" },
+			{ "Right Ring Intermediate", "Right Hand" },
+			{ "Right Ring Distal", "Right Hand" },
+			{ "Right Little Proximal", "Right Hand" },
+			{ "Right Little Intermediate", "Right Hand" },
+			{ "Right Little Distal", "Right Hand" },
+		};
 
-        private string[] _importNormalsNames;
-        GLTFImporter importer;
-        readonly Dictionary<string, Transform> boneTransforms = new();
-        readonly Dictionary<string, string> assignedBoneNames = new();
-        Avatar avatar;
-        int selectedBoneGroupTab = 0;
+		private string[] _importNormalsNames;
+		GLTFImporter importer;
+		readonly Dictionary<string, Transform> boneTransforms = new();
+		readonly Dictionary<string, string> assignedBoneNames = new();
+		Avatar avatar;
+		int selectedBoneGroupTab = 0;
 
-        public override void OnEnable()
+		public override void OnEnable()
 		{
 			if (!this) return;
 
-            importer = target as GLTFImporter;
+			importer = target as GLTFImporter;
 
-            var m_HasSceneData = serializedObject.FindProperty(nameof(GLTFImporter.m_HasSceneData));
+			var m_HasSceneData = serializedObject.FindProperty(nameof(GLTFImporter.m_HasSceneData));
 			if (m_HasSceneData.boolValue)
 				AddTab(new GLTFAssetImporterTab(this, "Model", ModelInspectorGUI));
 
@@ -117,42 +117,42 @@ namespace UnityGLTF
 			AddTab(new GLTFAssetImporterTab(this, "Extensions", ExtensionInspectorGUI));
 			AddTab(new GLTFAssetImporterTab(this, "Info", AssetInfoInspectorGUI));
 
-            BoneAssignmentDotIcon = (Texture)EditorGUIUtility.Load("DotFill");
-            BoneAssignmentDotFrameIcon = (Texture)EditorGUIUtility.Load("DotFrame");
-            BoneAssignmentDotFrameDottedIcon = (Texture)EditorGUIUtility.Load("DotFrameDotted");
+			BoneAssignmentDotIcon = (Texture)EditorGUIUtility.Load("DotFill");
+			BoneAssignmentDotFrameIcon = (Texture)EditorGUIUtility.Load("DotFrame");
+			BoneAssignmentDotFrameDottedIcon = (Texture)EditorGUIUtility.Load("DotFrameDotted");
 
-            var animationMethod = serializedObject.FindProperty(nameof(GLTFImporter._importAnimations));
-            if (animationMethod.enumValueIndex == (int)AnimationMethod.MecanimHumanoid)
-            {
-                avatar = AssetDatabase.LoadAssetAtPath<Avatar>(importer.assetPath);
+			var animationMethod = serializedObject.FindProperty(nameof(GLTFImporter._importAnimations));
+			if (animationMethod.enumValueIndex == (int)AnimationMethod.MecanimHumanoid)
+			{
+				avatar = AssetDatabase.LoadAssetAtPath<Avatar>(importer.assetPath);
 
-                if (avatar && avatar.isHuman && avatar.isValid) PopulateBoneInfo();
-            }
+				if (avatar && avatar.isHuman && avatar.isValid) PopulateBoneInfo();
+			}
 
-            base.OnEnable();
+			base.OnEnable();
 		}
 
-        void PopulateBoneInfo()
-        {
-            var modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(importer.assetPath);
-            boneTransforms.Clear();
-            assignedBoneNames.Clear();
+		void PopulateBoneInfo()
+		{
+			var modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(importer.assetPath);
+			boneTransforms.Clear();
+			assignedBoneNames.Clear();
 
-            if (modelAsset)
-            {
-                foreach (var transform in modelAsset.GetComponentsInChildren<Transform>(true))
-                {
-                    boneTransforms[transform.name] = transform;
-                }
+			if (modelAsset)
+			{
+				foreach (var transform in modelAsset.GetComponentsInChildren<Transform>(true))
+				{
+					boneTransforms[transform.name] = transform;
+				}
 
-                foreach (var bone in avatar.humanDescription.human)
-                {
-                    assignedBoneNames[bone.humanName] = bone.boneName;
-                }
-            }
-        }
+				foreach (var bone in avatar.humanDescription.human)
+				{
+								assignedBoneNames[bone.humanName] = bone.boneName;
+							}
+						}
+					}
 
-        public override void OnInspectorGUI()
+					public override void OnInspectorGUI()
 		{
 			TextureWarningsGUI();
 			EditorGUILayout.Space();
@@ -301,125 +301,125 @@ namespace UnityGLTF
 			}
 		}
 
-        private void AnimationInspectorGUI()
-        {
-            if (!importer) return;
+		private void AnimationInspectorGUI()
+		{
+			if (!importer) return;
 
-            var hasAnimationData = serializedObject.FindProperty(nameof(GLTFImporter.m_HasAnimationData)).boolValue;
+			var hasAnimationData = serializedObject.FindProperty(nameof(GLTFImporter.m_HasAnimationData)).boolValue;
 
-            if (!hasAnimationData)
-            {
-                EditorGUILayout.HelpBox("File doesn't contain animation data.", MessageType.None);
-            }
+			if (!hasAnimationData)
+			{
+				EditorGUILayout.HelpBox("File doesn't contain animation data.", MessageType.None);
+			}
 
-            var animationMethod = serializedObject.FindProperty(nameof(GLTFImporter._importAnimations));
-            EditorGUILayout.PropertyField(animationMethod, new GUIContent("Animation Type"));
-            if (animationMethod.enumValueIndex == (int)AnimationMethod.MecanimHumanoid)
-            {
-                var flip = serializedObject.FindProperty(nameof(GLTFImporter._mecanimHumanoidFlip));
-                EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(flip, new GUIContent("Flip Forward", "Some formats like VRM have a different forward direction for Avatars. Enable this option if the animation looks inverted."));
-                EditorGUI.indentLevel--;
-            }
+			var animationMethod = serializedObject.FindProperty(nameof(GLTFImporter._importAnimations));
+			EditorGUILayout.PropertyField(animationMethod, new GUIContent("Animation Type"));
+			if (animationMethod.enumValueIndex == (int)AnimationMethod.MecanimHumanoid)
+			{
+				var flip = serializedObject.FindProperty(nameof(GLTFImporter._mecanimHumanoidFlip));
+				EditorGUI.indentLevel++;
+				EditorGUILayout.PropertyField(flip, new GUIContent("Flip Forward", "Some formats like VRM have a different forward direction for Avatars. Enable this option if the animation looks inverted."));
+				EditorGUI.indentLevel--;
+			}
 
 			var animations = serializedObject.FindProperty(GLTFImporter.AnimationsPropertyName);
-            if (hasAnimationData && animationMethod.enumValueIndex > 0)
-            {
-                var loopTime = serializedObject.FindProperty(nameof(GLTFImporter._animationLoopTime));
+			if (hasAnimationData && animationMethod.enumValueIndex > 0)
+			{
+				var loopTime = serializedObject.FindProperty(nameof(GLTFImporter._animationLoopTime));
 				var loopPose = serializedObject.FindProperty(nameof(GLTFImporter._animationLoopPose));
 				var perClipLoopSettings = serializedObject.FindProperty(nameof(GLTFImporter._animationLoopSettingsPerClip));
 
 				// when set per clip, the loop settings are edited in the Animations list below
 				if (!perClipLoopSettings.boolValue)
 				{
-				EditorGUILayout.PropertyField(loopTime, new GUIContent("Loop Time"));
-				if (loopTime.boolValue)
-				{
-					EditorGUI.indentLevel++;
+					EditorGUILayout.PropertyField(loopTime, new GUIContent("Loop Time"));
+					if (loopTime.boolValue)
+					{
+						EditorGUI.indentLevel++;
 						EditorGUILayout.PropertyField(loopPose, new GUIContent("Loop Pose"));
-					EditorGUI.indentLevel--;
+						EditorGUI.indentLevel--;
 					}
-                }
+				}
 
 				EditorGUI.BeginChangeCheck();
 				EditorGUILayout.PropertyField(perClipLoopSettings, PerClipLoopSettingsContent);
 				if (EditorGUI.EndChangeCheck() && perClipLoopSettings.boolValue)
 				{
 					CopyLoopSettingsToClips(animations, loopTime.boolValue, loopPose.boolValue);
-					animations.isExpanded = true; // the settings are edited there now, so make sure the list is visible
-				}
-            }
+							animations.isExpanded = true; // the settings are edited there now, so make sure the list is visible
+						}
+					}
 
-            // show animations for clip import editing
-            if (animations.arraySize > 0)
-            {
-                EditorGUILayout.Space();
-				AnimationClipListGUI(animations);
-            }
+					// show animations for clip import editing
+					if (animations.arraySize > 0)
+					{
+						EditorGUILayout.Space();
+						AnimationClipListGUI(animations);
+					}
 
-            if (animationMethod.enumValueIndex == (int)AnimationMethod.MecanimHumanoid)
-            {
-                // List all bones and any assigned gameobjects.
-                if (avatar && avatar.isHuman && avatar.isValid)
-                {
-                    var humanBones = avatar.humanDescription.human;
-                    var allMecanimBonesCount = HumanTrait.BoneName.Length;
-                    EditorGUILayout.Separator();
-                    EditorGUILayout.LabelField("Avatar Bones", EditorStyles.boldLabel);
-                    EditorGUILayout.LabelField("Assigned Bones:", humanBones.Length + "/" + allMecanimBonesCount);
+					if (animationMethod.enumValueIndex == (int)AnimationMethod.MecanimHumanoid)
+					{
+						// List all bones and any assigned gameobjects.
+						if (avatar && avatar.isHuman && avatar.isValid)
+						{
+							var humanBones = avatar.humanDescription.human;
+							var allMecanimBonesCount = HumanTrait.BoneName.Length;
+							EditorGUILayout.Separator();
+							EditorGUILayout.LabelField("Avatar Bones", EditorStyles.boldLabel);
+							EditorGUILayout.LabelField("Assigned Bones:", humanBones.Length + "/" + allMecanimBonesCount);
 
-                    EditorGUILayout.BeginHorizontal();
-                    var legendIconRect = GUILayoutUtility.GetRect(18, 18, GUILayout.Width(18), GUILayout.Height(18));
-                    GUI.DrawTexture(legendIconRect, BoneAssignmentDotFrameDottedIcon, ScaleMode.ScaleToFit, true);
-                    GUILayout.Label("Optional Bone", EditorStyles.miniLabel);
-                    EditorGUILayout.EndHorizontal();
+							EditorGUILayout.BeginHorizontal();
+							var legendIconRect = GUILayoutUtility.GetRect(18, 18, GUILayout.Width(18), GUILayout.Height(18));
+							GUI.DrawTexture(legendIconRect, BoneAssignmentDotFrameDottedIcon, ScaleMode.ScaleToFit, true);
+							GUILayout.Label("Optional Bone", EditorStyles.miniLabel);
+							EditorGUILayout.EndHorizontal();
 
-                    selectedBoneGroupTab = GUILayout.Toolbar(selectedBoneGroupTab, boneGroupTabs);
+							selectedBoneGroupTab = GUILayout.Toolbar(selectedBoneGroupTab, boneGroupTabs);
 
-                    EditorGUI.indentLevel++;
+									EditorGUI.indentLevel++;
 
-                    for (var i = 0; i < allMecanimBonesCount; i++)
-                    {
-                        var mecanimBoneName = HumanTrait.BoneName[i];
-                        if (boneGroupTabs[selectedBoneGroupTab] != boneGroups[mecanimBoneName])  continue;
+									for (var i = 0; i < allMecanimBonesCount; i++)
+									{
+										var mecanimBoneName = HumanTrait.BoneName[i];
+										if (boneGroupTabs[selectedBoneGroupTab] != boneGroups[mecanimBoneName])  continue;
 
-                        assignedBoneNames.TryGetValue(mecanimBoneName, out string assignedBoneName);
-                        Transform transform = null;
-                        if (!string.IsNullOrEmpty(assignedBoneName))
-                        {
-                            boneTransforms.TryGetValue(assignedBoneName, out transform);
-                        }
+										assignedBoneNames.TryGetValue(mecanimBoneName, out string assignedBoneName);
+										Transform transform = null;
+										if (!string.IsNullOrEmpty(assignedBoneName))
+										{
+											boneTransforms.TryGetValue(assignedBoneName, out transform);
+										}
 
-                        EditorGUILayout.BeginHorizontal();
+										EditorGUILayout.BeginHorizontal();
 
-                        var iconRect = GUILayoutUtility.GetRect(18, 18, GUILayout.Width(18), GUILayout.Height(18));
-                        var frameIcon = HumanTrait.RequiredBone(i) ? BoneAssignmentDotFrameIcon : BoneAssignmentDotFrameDottedIcon;
+										var iconRect = GUILayoutUtility.GetRect(18, 18, GUILayout.Width(18), GUILayout.Height(18));
+										var frameIcon = HumanTrait.RequiredBone(i) ? BoneAssignmentDotFrameIcon : BoneAssignmentDotFrameDottedIcon;
 
-                        if (transform)
-                        {
-                            var originalColor = GUI.color;
-                            GUI.color = Color.green;
-                            GUI.DrawTexture(iconRect, frameIcon, ScaleMode.ScaleToFit, true);
-                            GUI.DrawTexture(iconRect, BoneAssignmentDotIcon, ScaleMode.ScaleToFit, true);
-                            GUI.color = originalColor;
-                        }
-                        else GUI.DrawTexture(iconRect, frameIcon, ScaleMode.ScaleToFit, true);
+										if (transform)
+										{
+											var originalColor = GUI.color;
+											GUI.color = Color.green;
+											GUI.DrawTexture(iconRect, frameIcon, ScaleMode.ScaleToFit, true);
+											GUI.DrawTexture(iconRect, BoneAssignmentDotIcon, ScaleMode.ScaleToFit, true);
+											GUI.color = originalColor;
+										}
+										else GUI.DrawTexture(iconRect, frameIcon, ScaleMode.ScaleToFit, true);
 
-                        GUILayout.Label(mecanimBoneName, GUILayout.Width(130));
+										GUILayout.Label(mecanimBoneName, GUILayout.Width(130));
 
-                        EditorGUI.BeginDisabledGroup(true);
-                        EditorGUILayout.ObjectField(transform, typeof(Transform), true);
-                        EditorGUI.EndDisabledGroup();
+										EditorGUI.BeginDisabledGroup(true);
+										EditorGUILayout.ObjectField(transform, typeof(Transform), true);
+										EditorGUI.EndDisabledGroup();
 
-                        EditorGUILayout.EndHorizontal();
-                    }
+										EditorGUILayout.EndHorizontal();
+									}
 
-                    EditorGUI.indentLevel--;
-                }
-                // warn if Humanoid rig import has failed
-                else EditorGUILayout.HelpBox("The model doesn't contain a valid Humanoid rig. See the console for more information.", MessageType.Error);
-            }
-        }
+									EditorGUI.indentLevel--;
+								}
+								// warn if Humanoid rig import has failed
+								else EditorGUILayout.HelpBox("The model doesn't contain a valid Humanoid rig. See the console for more information.", MessageType.Error);
+							}
+							}
 
 		private void MaterialInspectorGUI()
 		{
@@ -555,14 +555,14 @@ namespace UnityGLTF
 							{
 								var mat = importedData.GetArrayElementAtIndex(i).objectReferenceValue as T;
 								if (!mat) continue;
-                                importer.RemoveRemap(new AssetImporter.SourceAssetIdentifier(mat));
+								importer.RemoveRemap(new AssetImporter.SourceAssetIdentifier(mat));
 							}
 
 							// also remove all old remaps
 							var oldRemaps = externalObjectMap.Where(x => x.Value is T).ToList();
 							foreach (var oldRemap in oldRemaps)
 							{
-                                importer.RemoveRemap(oldRemap.Key);
+								importer.RemoveRemap(oldRemap.Key);
 							}
 						}
 					}
@@ -600,9 +600,9 @@ namespace UnityGLTF
 						if (EditorGUI.EndChangeCheck())
 						{
 							if (newObj && newObj != mat)
-                                importer.AddRemap(id, newObj);
+								importer.AddRemap(id, newObj);
 							else
-                                importer.RemoveRemap(id);
+								importer.RemoveRemap(id);
 						}
 
 						if (!remap)
@@ -617,7 +617,7 @@ namespace UnityGLTF
 						{
 							if (GUILayout.Button("Restore", GUILayout.Width(60)))
 							{
-                                importer.RemoveRemap(id);
+								importer.RemoveRemap(id);
 #if UNITY_2022_2_OR_NEWER
 								SaveChanges();
 #else
@@ -724,7 +724,7 @@ namespace UnityGLTF
 								overrideEnabled = true,
 							};
 							overridePlugin = newPlugin;
-                            importer._importPlugins.Add(newPlugin);
+							importer._importPlugins.Add(newPlugin);
 						}
 					}
 					EditorUtility.SetDirty(importer);
