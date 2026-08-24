@@ -346,80 +346,80 @@ namespace UnityGLTF
 				if (EditorGUI.EndChangeCheck() && perClipLoopSettings.boolValue)
 				{
 					CopyLoopSettingsToClips(animations, loopTime.boolValue, loopPose.boolValue);
-							animations.isExpanded = true; // the settings are edited there now, so make sure the list is visible
-						}
-					}
+					animations.isExpanded = true; // the settings are edited there now, so make sure the list is visible
+				}
+			}
 
-					// show animations for clip import editing
-					if (animations.arraySize > 0)
-					{
-						EditorGUILayout.Space();
-						AnimationClipListGUI(animations);
-					}
+			// show animations for clip import editing
+			if (animations.arraySize > 0)
+			{
+				EditorGUILayout.Space();
+				AnimationClipListGUI(animations);
+			}
 
-					if (animationMethod.enumValueIndex == (int)AnimationMethod.MecanimHumanoid)
+			if (animationMethod.enumValueIndex == (int)AnimationMethod.MecanimHumanoid)
+			{
+				// List all bones and any assigned gameobjects.
+				if (avatar && avatar.isHuman && avatar.isValid)
+				{
+					var humanBones = avatar.humanDescription.human;
+					var allMecanimBonesCount = HumanTrait.BoneName.Length;
+					EditorGUILayout.Separator();
+					EditorGUILayout.LabelField("Avatar Bones", EditorStyles.boldLabel);
+					EditorGUILayout.LabelField("Assigned Bones:", humanBones.Length + "/" + allMecanimBonesCount);
+
+					EditorGUILayout.BeginHorizontal();
+					var legendIconRect = GUILayoutUtility.GetRect(18, 18, GUILayout.Width(18), GUILayout.Height(18));
+					GUI.DrawTexture(legendIconRect, BoneAssignmentDotFrameDottedIcon, ScaleMode.ScaleToFit, true);
+					GUILayout.Label("Optional Bone", EditorStyles.miniLabel);
+					EditorGUILayout.EndHorizontal();
+
+					selectedBoneGroupTab = GUILayout.Toolbar(selectedBoneGroupTab, boneGroupTabs);
+
+					EditorGUI.indentLevel++;
+
+					for (var i = 0; i < allMecanimBonesCount; i++)
 					{
-						// List all bones and any assigned gameobjects.
-						if (avatar && avatar.isHuman && avatar.isValid)
+						var mecanimBoneName = HumanTrait.BoneName[i];
+						if (boneGroupTabs[selectedBoneGroupTab] != boneGroups[mecanimBoneName])  continue;
+
+						assignedBoneNames.TryGetValue(mecanimBoneName, out string assignedBoneName);
+						Transform transform = null;
+						if (!string.IsNullOrEmpty(assignedBoneName))
 						{
-							var humanBones = avatar.humanDescription.human;
-							var allMecanimBonesCount = HumanTrait.BoneName.Length;
-							EditorGUILayout.Separator();
-							EditorGUILayout.LabelField("Avatar Bones", EditorStyles.boldLabel);
-							EditorGUILayout.LabelField("Assigned Bones:", humanBones.Length + "/" + allMecanimBonesCount);
+							boneTransforms.TryGetValue(assignedBoneName, out transform);
+						}
 
-							EditorGUILayout.BeginHorizontal();
-							var legendIconRect = GUILayoutUtility.GetRect(18, 18, GUILayout.Width(18), GUILayout.Height(18));
-							GUI.DrawTexture(legendIconRect, BoneAssignmentDotFrameDottedIcon, ScaleMode.ScaleToFit, true);
-							GUILayout.Label("Optional Bone", EditorStyles.miniLabel);
-							EditorGUILayout.EndHorizontal();
+						EditorGUILayout.BeginHorizontal();
 
-							selectedBoneGroupTab = GUILayout.Toolbar(selectedBoneGroupTab, boneGroupTabs);
+						var iconRect = GUILayoutUtility.GetRect(18, 18, GUILayout.Width(18), GUILayout.Height(18));
+						var frameIcon = HumanTrait.RequiredBone(i) ? BoneAssignmentDotFrameIcon : BoneAssignmentDotFrameDottedIcon;
 
-									EditorGUI.indentLevel++;
+						if (transform)
+						{
+							var originalColor = GUI.color;
+							GUI.color = Color.green;
+							GUI.DrawTexture(iconRect, frameIcon, ScaleMode.ScaleToFit, true);
+							GUI.DrawTexture(iconRect, BoneAssignmentDotIcon, ScaleMode.ScaleToFit, true);
+							GUI.color = originalColor;
+						}
+						else GUI.DrawTexture(iconRect, frameIcon, ScaleMode.ScaleToFit, true);
 
-									for (var i = 0; i < allMecanimBonesCount; i++)
-									{
-										var mecanimBoneName = HumanTrait.BoneName[i];
-										if (boneGroupTabs[selectedBoneGroupTab] != boneGroups[mecanimBoneName])  continue;
+						GUILayout.Label(mecanimBoneName, GUILayout.Width(130));
 
-										assignedBoneNames.TryGetValue(mecanimBoneName, out string assignedBoneName);
-										Transform transform = null;
-										if (!string.IsNullOrEmpty(assignedBoneName))
-										{
-											boneTransforms.TryGetValue(assignedBoneName, out transform);
-										}
+						EditorGUI.BeginDisabledGroup(true);
+						EditorGUILayout.ObjectField(transform, typeof(Transform), true);
+						EditorGUI.EndDisabledGroup();
 
-										EditorGUILayout.BeginHorizontal();
+						EditorGUILayout.EndHorizontal();
+					}
 
-										var iconRect = GUILayoutUtility.GetRect(18, 18, GUILayout.Width(18), GUILayout.Height(18));
-										var frameIcon = HumanTrait.RequiredBone(i) ? BoneAssignmentDotFrameIcon : BoneAssignmentDotFrameDottedIcon;
-
-										if (transform)
-										{
-											var originalColor = GUI.color;
-											GUI.color = Color.green;
-											GUI.DrawTexture(iconRect, frameIcon, ScaleMode.ScaleToFit, true);
-											GUI.DrawTexture(iconRect, BoneAssignmentDotIcon, ScaleMode.ScaleToFit, true);
-											GUI.color = originalColor;
-										}
-										else GUI.DrawTexture(iconRect, frameIcon, ScaleMode.ScaleToFit, true);
-
-										GUILayout.Label(mecanimBoneName, GUILayout.Width(130));
-
-										EditorGUI.BeginDisabledGroup(true);
-										EditorGUILayout.ObjectField(transform, typeof(Transform), true);
-										EditorGUI.EndDisabledGroup();
-
-										EditorGUILayout.EndHorizontal();
-									}
-
-									EditorGUI.indentLevel--;
-								}
-								// warn if Humanoid rig import has failed
-								else EditorGUILayout.HelpBox("The model doesn't contain a valid Humanoid rig. See the console for more information.", MessageType.Error);
-							}
-							}
+					EditorGUI.indentLevel--;
+				}
+				// warn if Humanoid rig import has failed
+				else EditorGUILayout.HelpBox("The model doesn't contain a valid Humanoid rig. See the console for more information.", MessageType.Error);
+			}
+		}
 
 		private void MaterialInspectorGUI()
 		{
