@@ -19,8 +19,8 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
         public bool InitializeInteractivityNodes(UnitExporter unitExporter)
         {
             var unit = unitExporter.unit as MaterialFloatInterpolate;
-            
-            var materialTemplate = "/materials/{" + PointersHelper.IdPointerMaterialIndex + "}/";
+
+            var materialTemplate = PointersHelper.IdPointerTemplMaterialByRef;
             var template = materialTemplate;
             
             var valueType = GltfTypes.Float;
@@ -31,7 +31,7 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
                 var gltfProperty = MaterialPointerHelper.GetPointer(unitExporter, (string)floatPropertyName, out var map);
                 if (gltfProperty == null)
                 {
-                    UnitExportLogging.AddErrorLog(unit, "color property name is not supported.");
+                    UnitExportLogging.AddErrorLog(unit, "float property name is not supported.");
                     return false;
                 }
 
@@ -42,11 +42,11 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
                     flipNode.ValueIn("b").MapToInputPort(unit.targetValue);
                     convertedValue = flipNode.ValueOut("out").ExpectedType(ExpectedType.Float);
                 }
-                template = materialTemplate + gltfProperty;
+                template = materialTemplate + "/" + gltfProperty;
             }
             else
             {
-                UnitExportLogging.AddErrorLog(unit, "color property name is not a literal or default value, which is not supported.");
+                UnitExportLogging.AddErrorLog(unit, "float property name is not a literal or default value, which is not supported.");
                 return false;
             } 
             
@@ -65,7 +65,7 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
             node.ValueIn(Pointer_InterpolateNode.IdPoint2).MapToInputPort(unit.pointB);
             node.FlowOut(Pointer_InterpolateNode.IdFlowOutDone).MapToControlOutput(unit.done);
             
-            PointersHelperVS.SetupPointerTemplateAndTargetInput(node, PointersHelper.IdPointerMaterialIndex, unit.target, template, valueType);
+            PointersHelperVS.SetupPointerTemplateAndTargetInput(node, PointersHelper.IdPointerMaterialRef, unit.target, template, valueType);
             return true;
         }
     }

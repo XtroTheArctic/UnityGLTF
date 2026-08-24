@@ -21,19 +21,21 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
         {
             HashSet<ValueInput> visitedInputs = new HashSet<ValueInput>();
             
-            bool IsQuaternionInput(ValueInput input)
+            bool IsTypeInput<T>(ValueInput input)
             {
                 if (visitedInputs.Contains(input))
                     return false;
                 visitedInputs.Add(input);
                 
-                if (input.type == typeof(Quaternion))
+                if (input.type == typeof(T))
                     return true;
+                if (input.type == typeof(object))
+                    return false;
 
                 if (input.hasDefaultValue)
                 {
                     if (input.unit.defaultValues.TryGetValue(input.key, out var defaultValue)
-                        && defaultValue is Quaternion)
+                        && defaultValue is T)
                         return true;
                     return false;
                 }
@@ -41,15 +43,27 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
                 if (input.hasValidConnection)
                 {
                     var source = input.connection.source;
-                    if (source.type == typeof(Quaternion))
+                    if (source.type == typeof(T))
                         return true;
                     
                     foreach (var nextInput in source.unit.valueInputs)
-                        if (IsQuaternionInput(nextInput))
+                        if (IsTypeInput<T>(nextInput))
                             return true;
                 }
 
                 return false;
+            }
+
+            bool IsQuaternionInput(ValueInput input)
+            {
+                visitedInputs.Clear();
+                return IsTypeInput<Quaternion>(input);   
+            }
+
+            bool IsMatrix4x4Input(ValueInput input)
+            {
+                visitedInputs.Clear();
+                return IsTypeInput<Matrix4x4>(input);
             }
             
             var unit = unitExporter.unit as GenericMultiply;
@@ -59,10 +73,21 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
             
             if (inputAIsQuat && inputBIsQuat)
             {
-                    var quatMulNode = unitExporter.CreateNode<Math_QuatMulNode>();
-                    quatMulNode.ValueIn("a").MapToInputPort(unit.a);
-                    quatMulNode.ValueIn("b").MapToInputPort(unit.b);
-                    quatMulNode.FirstValueOut().MapToPort(unit.product);
+                var quatMulNode = unitExporter.CreateNode<Math_QuatMulNode>();
+                quatMulNode.ValueIn("a").MapToInputPort(unit.a);
+                quatMulNode.ValueIn("b").MapToInputPort(unit.b);
+                quatMulNode.FirstValueOut().MapToPort(unit.product);
+                return true;
+            }
+            
+            var inputAisMatrix = IsMatrix4x4Input(unit.a);
+            var inputBisMatrix = IsMatrix4x4Input(unit.b);
+            if (inputAisMatrix && inputBisMatrix)
+            {
+                var matMulNode = unitExporter.CreateNode<Math_MatMulNode>();
+                matMulNode.ValueIn("a").MapToInputPort(unit.a);
+                matMulNode.ValueIn("b").MapToInputPort(unit.b);
+                matMulNode.FirstValueOut().MapToPort(unit.product);
                 return true;
             }
             
@@ -72,7 +97,7 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
             mulNode.FirstValueOut().MapToPort(unit.product);
             
             // We need to check later - when its available - the input type of the node,
-            unitExporter.vsExportContext.OnUnitNodesCreated += nodes =>
+            unitExporter.vsExportContext.OnUnitNodesCreatedStage2 += nodes =>
             {
                 var valueTypeA = unitExporter.vsExportContext.GetValueTypeForInput(mulNode, "a");
                 var valueTypeB = unitExporter.vsExportContext.GetValueTypeForInput(mulNode, "b");
@@ -81,8 +106,15 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
                     && valueTypeB == GltfTypes.TypeIndexByGltfSignature("float3"))
                 {
                     mulNode.SetSchema(new Math_Rotate3dNode(), false);
-                    mulNode.ValueIn("b").SetType(TypeRestriction.LimitToFloat4);
-                    mulNode.ValueIn("a").SetType(TypeRestriction.LimitToFloat3);
+                    var oldSocketA = mulNode.ValueIn("a");
+                    var oldSocketB = mulNode.ValueIn("b");
+                    mulNode.ValueInConnection.Clear();
+                    
+                    mulNode.ValueIn(Math_Rotate3dNode.IdInputQuaternion);
+                    mulNode.ValueIn(Math_Rotate3dNode.IdInputVector);
+                        
+                    mulNode.ValueInConnection[Math_Rotate3dNode.IdInputQuaternion] = oldSocketA.socket.Value;
+                    mulNode.ValueInConnection[Math_Rotate3dNode.IdInputVector] = oldSocketB.socket.Value;
                     mulNode.FirstValueOut().ExpectedType(ExpectedType.Float3);
                 }
                 else

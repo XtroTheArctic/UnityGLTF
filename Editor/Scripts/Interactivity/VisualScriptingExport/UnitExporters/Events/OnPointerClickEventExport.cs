@@ -6,6 +6,7 @@ namespace UnityGLTF.Interactivity.VisualScripting.Export
 {
     public class OnPointerClickEventExport : GameObjectEvents<OnPointerClick, Event_OnSelectNode>
     {
+
         [InitializeOnLoadMethod]
         private static void Register()
         {
