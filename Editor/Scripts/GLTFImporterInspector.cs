@@ -188,13 +188,13 @@ namespace UnityGLTF
 			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(GLTFImporter._scaleFactor)));
 			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(GLTFImporter._importCamera)));
 			EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(GLTFImporter._deduplicateResources)));
-			if (t._deduplicatedStatistics != null && t._deduplicateResources != DeduplicateOptions.None)
+			if (importer._deduplicatedStatistics != null && importer._deduplicateResources != DeduplicateOptions.None)
 			{
-				var stats = t._deduplicatedStatistics;
-				var meshText = t._deduplicateResources.HasFlag(DeduplicateOptions.Meshes)
+				var stats = importer._deduplicatedStatistics;
+				var meshText = importer._deduplicateResources.HasFlag(DeduplicateOptions.Meshes)
 					? $"Removed {stats.MeshesRemoved} Meshes ({stats.meshCountAfter}/{stats.meshCountBefore}). "
 					: "";
-				var textureText = t._deduplicateResources.HasFlag(DeduplicateOptions.Textures)
+				var textureText = importer._deduplicateResources.HasFlag(DeduplicateOptions.Textures)
 					? $"Removed {stats.TexturesRemoved} Textures  ({stats.textureCountAfter}/{stats.textureCountBefore}). "
 					: "";
 				EditorGUILayout.LabelField(" ", meshText+textureText, EditorStyles.miniLabel);
